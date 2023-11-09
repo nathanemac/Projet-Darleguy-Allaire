@@ -69,7 +69,7 @@ test_graph_prim = Prim(G)
   # 2 : exemple sur un TSP symétrique
 graph = build_graph("Phase 1/instances/stsp/bays29.tsp", "Graph_Test")
 graph_kruskal = Kruskal(graph)
-graph_prim = Prim(graph, graph.nodes[1])
+graph_prim = Prim(graph, st_node = graph.nodes[1])
 
 # le graphe est gros donc difficile de savoir si c'est optimal ou pas. 
 
