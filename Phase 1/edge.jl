@@ -1,7 +1,7 @@
 #################################
 ########### Phase 1 #############
 #################################
-
+import Base.==
 abstract type AbstractEdge{T, U} end
 
 mutable struct Edge{T, U} <: AbstractEdge{T, U}
@@ -104,4 +104,10 @@ function read_edges(header::Dict{String, String}, filename::String)
   end
   close(file)
   return edges
+end
+
+"""Compare deux arêtes"""
+function ==(e1::Edge, e2::Edge)
+  return (e1.start_node==e2.start_node && e1.end_node==e2.end_node && e1.weight==e2.weight) ||
+        (e1.start_node == e2.end_node && e1.end_node == e2.start_node && e1.weight == e2.weight)
 end
