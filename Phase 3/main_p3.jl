@@ -126,7 +126,7 @@ function HK(graph::ExtendedGraph; special_node::Node = graph.nodes[1], maxIter =
     push!(dk, length(voisins))
   end
 
-  # Ensuite, on retire les arêtes en double
+  # Ensuite, on retire les arêtes en double : V contient 2 fois trop d'arêtes car (a voisin de b) => (b voisin de a)
   
   VV = []
   for e in vcat(V...)
@@ -149,7 +149,17 @@ function HK(graph::ExtendedGraph; special_node::Node = graph.nodes[1], maxIter =
     end
 
     # On crée le nouveau graphe avec les arêtes mises à jour
-    new_graph = ExtendedGraph("graphe $k", graph_copy.nodes, [e for e in VV])
+    for e_VV in VV
+      for e in graph_copy.edges
+        if e_VV.start_node == e.start_node && e_VV.end_node == e.end_node
+          w = e.weight
+          e.weight = e_VV.weight
+          # println("poids : ", w," -> ", e.weight)
+        end
+      end
+    end
+                
+    new_graph = ExtendedGraph("graphe $k", graph_copy.nodes, graph_copy.edges)
     Tk = find_minimum_1tree(new_graph)
     k += 1
     tk = 1/(k+1)
@@ -177,3 +187,5 @@ function HK(graph::ExtendedGraph; special_node::Node = graph.nodes[1], maxIter =
   end
   return Tk
 end
+
+# Semble ne pas fonctionner : le poids des arêtes sont mis à jour, mais 
