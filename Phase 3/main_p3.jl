@@ -114,7 +114,7 @@ function HK(graph::ExtendedGraph; special_node::Node = graph.nodes[1], maxIter =
   k = 0
   println("itération $k")
   πk = zeros(n)
-  Tk = find_minimum_1tree(graph_copy)
+  Tk = find_minimum_1tree(graph_copy, special_node = special_node)
   tk = 1
 
   # calcul de dk : 
@@ -183,9 +183,10 @@ function HK(graph::ExtendedGraph; special_node::Node = graph.nodes[1], maxIter =
     # calcul de vk :
     vk = dk .- 2
     nvk = norm(vk)    
-    println("itération $k")
+    #println("itération $k")
   end
   return Tk
 end
 
-# Semble ne pas fonctionner : le poids des arêtes sont mis à jour, mais 
+r = HK(cours, special_node=cours.nodes[2])
+# Semble ne pas fonctionner : le poids des arêtes sont mis à jour, mais les arêtes restent les mêmes quoi qu'il advienne
