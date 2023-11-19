@@ -105,7 +105,7 @@ function neighbours(graph::ExtendedGraph, node::Node)
   return arêtes_voisins
 end
 
-function HK(graph::ExtendedGraph; special_node::Node = graph.nodes[1], maxIter = 10_000, ϵ = 1e-5)
+function HK(graph::ExtendedGraph; special_node::Node = graph.nodes[1], maxIter = 3000, ϵ = 1e-5, verbose::Int=-1)
 
   graph_copy = deepcopy(graph)
 
@@ -115,6 +115,7 @@ function HK(graph::ExtendedGraph; special_node::Node = graph.nodes[1], maxIter =
   println("itération $k")
   πk = zeros(n)
   Tk = find_minimum_1tree(graph_copy, special_node = special_node)
+  T0 = deepcopy(Tk)
   tk = 1
 
   # calcul de dk : 
@@ -126,7 +127,7 @@ function HK(graph::ExtendedGraph; special_node::Node = graph.nodes[1], maxIter =
     push!(dk, length(voisins))
   end
 
-  # Ensuite, on retire les arêtes en double : V contient 2 fois trop d'arêtes car (a voisin de b) => (b voisin de a)
+  # Ensuite, on retire les arêtes en double : V contient 2 fois trop d'arêtes car (a voisin de b) <=> (b voisin de a)
   
   VV = []
   for e in vcat(V...)
@@ -137,6 +138,7 @@ function HK(graph::ExtendedGraph; special_node::Node = graph.nodes[1], maxIter =
 
   # calcul de vk :
   vk = dk .- 2
+  v0 = vk
   nvk = norm(vk)
 
   while nvk > ϵ && k < maxIter # vk tend vers 0 composante par composante, donc sa norme tend vers 0
@@ -162,6 +164,7 @@ function HK(graph::ExtendedGraph; special_node::Node = graph.nodes[1], maxIter =
     new_graph = ExtendedGraph("graphe $k", graph_copy.nodes, graph_copy.edges)
     Tk = find_minimum_1tree(new_graph)
     k += 1
+    (k % verbose == 0) && println("itération ", k)
     tk = 1/(k+1)
 
     dk = []
@@ -183,10 +186,28 @@ function HK(graph::ExtendedGraph; special_node::Node = graph.nodes[1], maxIter =
     # calcul de vk :
     vk = dk .- 2
     nvk = norm(vk)    
-    #println("itération $k")
+    if k == maxIter
+      println("maximum iteration criterion reached at k = $k")
+    elseif nvk ≤ ϵ 
+      println("algorithm converged to a optimal tour at k = $k")
+    end
   end
-  return Tk
+  return T0, Tk, v0, vk
 end
 
 r = HK(cours, special_node=cours.nodes[2])
 # Semble ne pas fonctionner : le poids des arêtes sont mis à jour, mais les arêtes restent les mêmes quoi qu'il advienne
+
+
+m1st_1 = find_minimum_1tree(cours, special_node = cours.nodes[1])
+M1ST = [find_minimum_1tree(cours, special_node = cours.nodes[i]) for i=1:9]
+
+r1 = HK(cours, special_node=cours.nodes[1])
+r2 = HK(cours, special_node=cours.nodes[2])
+r3 = HK(cours, special_node=cours.nodes[3], maxIter = 10_000)
+
+
+
+graph_tsp = build_graph("Phase 1/instances/stsp/bays29.tsp", "Graph_Test")
+
+r = HK(graph_tsp, verbose=10)
