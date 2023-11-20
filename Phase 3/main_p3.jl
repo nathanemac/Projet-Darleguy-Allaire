@@ -82,6 +82,7 @@ function find_minimum_1tree(graph::ExtendedGraph; special_node::Node=graph.nodes
 
   # Ajoute special_node à subgraph
   push!(subgraph.nodes, special_node)
+  sort!(mst.nodes, by = node -> node.name)
   mst
 end
 
@@ -108,11 +109,9 @@ end
 function HK(graph::ExtendedGraph; special_node::Node = graph.nodes[1], maxIter = 3000, ϵ = 1e-5, verbose::Int=-1)
 
   graph_copy = deepcopy(graph)
-
   ### Initialisation ###
   n = length(graph_copy.nodes)
   k = 0
-  println("itération $k")
   πk = zeros(n)
   Tk = find_minimum_1tree(graph_copy, special_node = special_node)
   T0 = deepcopy(Tk)
@@ -127,15 +126,6 @@ function HK(graph::ExtendedGraph; special_node::Node = graph.nodes[1], maxIter =
     push!(dk, length(voisins))
   end
 
-  # Ensuite, on retire les arêtes en double : V contient 2 fois trop d'arêtes car (a voisin de b) <=> (b voisin de a)
-  
-  VV = []
-  for e in vcat(V...)
-    if e ∉ VV
-      push!(VV, e)
-    end
-  end
-
   # calcul de vk :
   vk = dk .- 2
   v0 = vk
@@ -143,28 +133,21 @@ function HK(graph::ExtendedGraph; special_node::Node = graph.nodes[1], maxIter =
 
   while nvk > ϵ && k < maxIter # vk tend vers 0 composante par composante, donc sa norme tend vers 0
     # On met à jour πk avec vk
-    πk = πk + tk * vk
+    πk .= πk .+ tk .* vk
     
     # On met à jour le poids des arêtes
     for i=1:n
-      VV[i].weight += πk[i]
-    end
-
-    # On crée le nouveau graphe avec les arêtes mises à jour
-    for e_VV in VV
+      current_node = graph_copy.nodes[i]
       for e in graph_copy.edges
-        if e_VV.start_node == e.start_node && e_VV.end_node == e.end_node
-          w = e.weight
-          e.weight = e_VV.weight
-          # println("poids : ", w," -> ", e.weight)
+        if (e.start_node == current_node || e.end_node == current_node)
+          e.weight += πk[i]
         end
       end
     end
-                
-    new_graph = ExtendedGraph("graphe $k", graph_copy.nodes, graph_copy.edges)
-    Tk = find_minimum_1tree(new_graph)
+    
+    # On cherche le 1-arbre minimal correspondant au graphe mis à jour
+    Tk = find_minimum_1tree(graph_copy)
     k += 1
-    (k % verbose == 0) && println("itération ", k)
     tk = 1/(k+1)
 
     dk = []
@@ -175,16 +158,9 @@ function HK(graph::ExtendedGraph; special_node::Node = graph.nodes[1], maxIter =
       push!(dk, length(voisins))
     end
   
-    # Et on réitère les manipulations de l'Initialisation    
-    VV = []
-    for e in vcat(V...)
-      if e ∉ VV
-        push!(VV, e)
-      end
-    end
-  
-    # calcul de vk :
+    # Calcul de vk pour le graphe mis à jour :
     vk = dk .- 2
+    println(vk)
     nvk = norm(vk)    
     if k == maxIter
       println("maximum iteration criterion reached at k = $k")
@@ -192,22 +168,21 @@ function HK(graph::ExtendedGraph; special_node::Node = graph.nodes[1], maxIter =
       println("algorithm converged to a optimal tour at k = $k")
     end
   end
-  return T0, Tk, v0, vk
+  graph_copy.name = "Optimal tour"
+  return Tk
 end
 
 r = HK(cours, special_node=cours.nodes[2])
 # Semble ne pas fonctionner : le poids des arêtes sont mis à jour, mais les arêtes restent les mêmes quoi qu'il advienne
-
 
 m1st_1 = find_minimum_1tree(cours, special_node = cours.nodes[1])
 M1ST = [find_minimum_1tree(cours, special_node = cours.nodes[i]) for i=1:9]
 
 r1 = HK(cours, special_node=cours.nodes[1])
 r2 = HK(cours, special_node=cours.nodes[2])
-r3 = HK(cours, special_node=cours.nodes[3], maxIter = 10_000)
-
+r3 = HK(cours, special_node=cours.nodes[3], maxIter = 100)
 
 
 graph_tsp = build_graph("Phase 1/instances/stsp/bays29.tsp", "Graph_Test")
 
-r = HK(graph_tsp, verbose=10)
+r = HK(graph_tsp)
