@@ -66,7 +66,7 @@ function read_edges(header::Dict{String, String}, filename::String)
                   for j = start : start + n_on_this_line - 1
                     # Les lignes suivantes ont été modifiées pour tenir compte du poids des arêtes
                     n_edges = n_edges + 1
-                    edge_weight_value = parse(Float64, data[start+j+1])
+                    edge_weight_value = parse(Float64, data[j+1])
                     if edge_weight_format in ["UPPER_ROW", "LOWER_COL"]
                       edge = (k+1, i+k+2, edge_weight_value)
                     elseif edge_weight_format in ["UPPER_DIAG_ROW", "LOWER_DIAG_COL"]
