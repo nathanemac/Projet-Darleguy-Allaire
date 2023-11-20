@@ -11,10 +11,10 @@ function build_graph(instance::String, title::String)
     @warn "weight type format must be EXPLICIT"
     return "Current format is :", header["EDGE_WEIGHT_TYPE"]
   end
-  if header["EDGE_WEIGHT_FORMAT"] != "FULL_MATRIX"
-    @warn "edge weight format must be FULL_MATRIX"
-    return "Current format is :", header["EDGE_WEIGHT_FORMAT"]
-  end
+  # if header["EDGE_WEIGHT_FORMAT"] != "FULL_MATRIX"
+  #   @warn "edge weight format must be FULL_MATRIX"
+  #   return "Current format is :", header["EDGE_WEIGHT_FORMAT"]
+  # end
 
   nodes_graph = read_nodes(header, instance)
   edges_graph = read_edges(header, instance)

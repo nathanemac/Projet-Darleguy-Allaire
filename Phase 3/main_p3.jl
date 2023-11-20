@@ -7,6 +7,7 @@ include("../Phase 2/utils.jl")
 include("../Phase 2/PriorityQueue.jl")
 
 using LinearAlgebra
+using Printf
 
 ##################################
 ##### Implémentation de HK : #####
@@ -86,10 +87,6 @@ function find_minimum_1tree(graph::ExtendedGraph; special_node::Node=graph.nodes
   mst
 end
 
-m1st = find_minimum_1tree(cours)
-# Semble fonctionner. 
-
-
 
 #### HK ####
 
@@ -106,15 +103,19 @@ function neighbours(graph::ExtendedGraph, node::Node)
   return arêtes_voisins
 end
 
-function HK(graph::ExtendedGraph; special_node::Node = graph.nodes[1], maxIter = 3000, ϵ = 1e-5, verbose::Int=-1)
+function HK(graph::ExtendedGraph; kruskal_or_prim = Kruskal,
+                                  special_node::Node = graph.nodes[1], 
+                                  maxIter::Int = 3000, 
+                                  ϵ::Real = 1e-5, 
+                                  verbose::Int=-1
+                                  )
 
   graph_copy = deepcopy(graph)
   ### Initialisation ###
   n = length(graph_copy.nodes)
   k = 0
   πk = zeros(n)
-  Tk = find_minimum_1tree(graph_copy, special_node = special_node)
-  T0 = deepcopy(Tk)
+  Tk = find_minimum_1tree(graph_copy, special_node = special_node, kruskal_or_prim = kruskal_or_prim)
   tk = 1
 
   # calcul de dk : 
@@ -128,8 +129,12 @@ function HK(graph::ExtendedGraph; special_node::Node = graph.nodes[1], maxIter =
 
   # calcul de vk :
   vk = dk .- 2
-  v0 = vk
   nvk = norm(vk)
+
+  if verbose > 0 && mod(k, verbose) == 0
+    @info @sprintf "%5s  %9s  %7s " "iter" "tk" "‖vk‖"
+    infoline = @sprintf "%5d  %9.2e  %7.1e" k tk nvk
+  end
 
   while nvk > ϵ && k < maxIter # vk tend vers 0 composante par composante, donc sa norme tend vers 0
     # On met à jour πk avec vk
@@ -160,29 +165,30 @@ function HK(graph::ExtendedGraph; special_node::Node = graph.nodes[1], maxIter =
   
     # Calcul de vk pour le graphe mis à jour :
     vk = dk .- 2
-    println(vk)
     nvk = norm(vk)    
+
+    if verbose > 0 && mod(k, verbose) == 0
+      @info infoline
+      infoline = @sprintf "%5d  %9.2e  %7.1e" k tk nvk
+    end
+
     if k == maxIter
       println("maximum iteration criterion reached at k = $k")
     elseif nvk ≤ ϵ 
       println("algorithm converged to a optimal tour at k = $k")
     end
   end
-  graph_copy.name = "Optimal tour"
+  Tk.name = "Optimal tour"
+  nvk_final = nvk
+  @info infoline
+  infoline = @sprintf "%5d  %9.2e  %7.1e" k tk nvk_final
   return Tk
 end
 
-r = HK(cours, special_node=cours.nodes[2])
-# Semble ne pas fonctionner : le poids des arêtes sont mis à jour, mais les arêtes restent les mêmes quoi qu'il advienne
 
-m1st_1 = find_minimum_1tree(cours, special_node = cours.nodes[1])
-M1ST = [find_minimum_1tree(cours, special_node = cours.nodes[i]) for i=1:9]
-
-r1 = HK(cours, special_node=cours.nodes[1])
-r2 = HK(cours, special_node=cours.nodes[2])
-r3 = HK(cours, special_node=cours.nodes[3], maxIter = 100)
-
+r = HK(cours, maxIter = 100, verbose=2) # converge en 15 itérations pour le noeud 1
 
 graph_tsp = build_graph("Phase 1/instances/stsp/bays29.tsp", "Graph_Test")
+r2 = HK(graph_tsp, verbose=10000, maxIter=200_000) # ne converge pas
 
-r = HK(graph_tsp)
+# Utilisation de la fonction
