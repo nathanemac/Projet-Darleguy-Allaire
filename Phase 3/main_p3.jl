@@ -56,7 +56,7 @@ poids_tour_gr17 = sum(map(edge -> edge.weight, r4.edges))
 
 # sur exemple du cours
 visited_nodes = Set{Node}()
-root_node = cours.nodes[1]  
+root_node = kruskal.nodes[1]  
 path = RSL!(kruskal, root_node, root_node, visited_nodes) 
 
 # sur un tsp
@@ -72,3 +72,4 @@ prim = Prim(graph_gr17)
 visited_nodes = Set{Node}()
 root_node = prim.nodes[1]  
 r5 = RSL!(prim, root_node, root_node, visited_nodes) 
+# OK. 
