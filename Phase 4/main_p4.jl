@@ -49,9 +49,8 @@ end
 
 r = HK(cours) # converge en 15 itérations pour le noeud 1
 
-
 """Suppose que les arêtes forment bien un tour"""
-function create_tour(graph::ExtendedGraph)
+function create_tour_HK(graph::ExtendedGraph)
   E = copy(graph.edges)
   tour_names = [E[1].start_node.name, E[1].end_node.name]
   tour = [E[1].start_node, E[1].end_node]
@@ -101,7 +100,7 @@ function cost_tour(graph::ExtendedGraph, tour::Vector{String})
   return cost
 end
 
-write_tour("tour cours", create_tour(r), Float32(cost_tour(r)))
+write_tour("tour cours", create_tour(r), Float32(cost_tour_HK(r)))
 # Ok fonctionne. A faire ensuite avec une tournée de RSL (vu que HL converge pas)
 
 # Test avec un tour donné
@@ -125,11 +124,10 @@ cost = cost_tour(graph_bays29_rsl, r)
 # 1)
 photo = build_graph("Phase 4/shredder-julia/tsp/instances/alaska-railroad.tsp", "Alaska Railroad")
 tour = RSL(photo)
-
 tour_parsed = parse.(Int, tour)
-write_tour("tour alaska-railroad RSL.tour", tour_parsed, Float32(cost_tour(photo, tour)))
-tour_filename = "Phase 4/shredder-julia/tsp/tours/alaska-railroad.tour"
-
+tour_parsed .-= 1
+write_tour("alaska-railroad RSL.tour", tour_parsed, Float32(cost_tour(photo, tour)))
+tour_filename = "alaska-railroad RSL.tour"
 reconstruct_picture(tour_filename, "Phase 4/shredder-julia/images/shuffled/alaska-railroad.png", "photo_train_rsl.png", view=true)
 # bizarre, le tour donne les noeuds dans l'ordre ...
 
@@ -137,9 +135,9 @@ reconstruct_picture(tour_filename, "Phase 4/shredder-julia/images/shuffled/alask
 photo2 = build_graph("Phase 4/shredder-julia/tsp/instances/pizza-food-wallpaper.tsp", "Pizza")
 tour2 = RSL(photo2)
 tour_parsed2 = parse.(Int, tour2)
-write_tour("tour pizza RSL.tour", tour_parsed2, Float32(cost_tour(photo2, tour2)))
-tour_filename = "Phase 4/shredder-julia/tsp/tours/alaska-railroad.tour"
-
-reconstruct_picture(tour_filename, "Phase 4/shredder-julia/images/shuffled/alaska-railroad.png", "photo_train_rsl.png", view=true)
+tour_parsed2 .-= 1
+write_tour("pizza RSL.tour", tour_parsed2, Float32(cost_tour(photo2, tour2)))
+tour_filename = "pizza RSL.tour"
+reconstruct_picture(tour_filename, "Phase 4/shredder-julia/images/shuffled/pizza-food-wallpaper.png", "photo_pizza_rsl.png", view=true)
 
 
