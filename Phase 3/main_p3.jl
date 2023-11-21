@@ -52,16 +52,23 @@ poids_tour_gr17 = sum(map(edge -> edge.weight, r4.edges))
 
 
 
+### RSL 
 
+# sur exemple du cours
+visited_nodes = Set{Node}()
+root_node = cours.nodes[1]  
+path = RSL!(kruskal, root_node, root_node, visited_nodes) 
 
+# sur un tsp
+graph_bays29_rsl = deepcopy(build_graph("Phase 1/instances/stsp/bays29.tsp", "Graph_Test"))
+prim = Prim(graph_bays29_rsl)
+visited_nodes = Set{Node}()
+root_node = prim.nodes[1]  
+r5 = RSL!(prim, root_node, root_node, visited_nodes) 
 
-
-#### HK 2-opt ####
-function two_opt(graph::ExtendedGraph, tour::ExtendedGraph)
-  tour_edges = tour.edges
-  graph_edges = graph.edges
-end
-
-
-## Phase 4
-photo = build_graph("Phase 4/shredder-julia/tsp/instances/alaska-railroad.tsp", "Graph_Test")
+# sur un autre tsp
+graph_gr17 = deepcopy(build_graph("Phase 1/instances/stsp/gr17.tsp", "Graph_Test"))
+prim = Prim(graph_gr17)
+visited_nodes = Set{Node}()
+root_node = prim.nodes[1]  
+r5 = RSL!(prim, root_node, root_node, visited_nodes) 

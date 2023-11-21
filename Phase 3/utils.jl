@@ -189,3 +189,21 @@ function HK(graph::ExtendedGraph; kruskal_or_prim = Kruskal,
   end 
   return Tk
 end
+
+function RSL!(graph::ExtendedGraph, racine::Node, root_node::Node, visited=Set{Node}(), path=Vector{String}())
+  push!(visited, racine)
+  push!(path, racine.name)  
+  edges = neighbours(graph, racine)
+  for e in edges
+      next_node = e.start_node == racine ? e.end_node : e.start_node
+      if !(next_node in visited)
+          next_node.parent = racine
+          RSL!(graph, next_node, root_node, visited, path)  
+      end
+  end
+
+  all_visited = all(node -> node in visited, nodes(graph))
+  if all_visited && path[end] != root_node.name
+    return path
+  end
+end
