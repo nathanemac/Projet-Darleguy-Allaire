@@ -10,9 +10,10 @@ include("shredder-julia/bin/tools.jl")
 
 using ImageMagick, FileIO, Images, ImageView
 
+#############################################################################################
+#############################################################################################
 photo = build_graph("Phase 4/shredder-julia/tsp/instances/alaska-railroad.tsp", "Graph_Test")
 tour = HK(photo, maxIter=10, verbose=1) # pas optimal car peu d'itérations, HK a pas convergé
-
 function create_graph()
   # 3 : exemple du cours
   a, b, c, d, e, f, g, h, i = Node("a", 1.0), Node("b", 1.0), Node("c", 1.0), Node("d", 1.0), Node("e", 1.0), Node("f", 1.0), Node("g", 1.0), Node("h", 1.0), Node("i", 1.0)
@@ -86,8 +87,18 @@ function create_tour(graph::ExtendedGraph)
   return tour_int
 end
 
-function cost_tour(tour::ExtendedGraph)
-  sum(map(edge -> edge.weight, tour.edges))
+function cost_tour(graph::ExtendedGraph, tour::Vector{String})
+  cost = 0.
+  edge_weights1 = Dict((edge.start_node.name, edge.end_node.name) => edge.weight for edge in graph.edges)
+  edge_weights2 = Dict((edge.end_node.name, edge.start_node.name) => edge.weight for edge in graph.edges)
+  dict_weights = merge(edge_weights1, edge_weights2)
+
+  for i=2:length(tour)
+    n1 = tour[i-1]
+    n2 = tour[i]
+    cost += dict_weights[n1, n2]
+  end
+  return cost
 end
 
 write_tour("tour cours", create_tour(r), Float32(cost_tour(r)))
@@ -97,5 +108,38 @@ write_tour("tour cours", create_tour(r), Float32(cost_tour(r)))
 tour_test = "Phase 4/shredder-julia/tsp/tours/alaska-railroad.tour"
 reconstruct_picture(tour_test, "Phase 4/shredder-julia/images/shuffled/alaska-railroad.png", "photo_train.png")
 # Ok fonctionne pour un fichier tour donné. 
+
+#### Depuis le début avec un tsp : ####
+graph_bays29_rsl = build_graph("Phase 1/instances/stsp/bays29.tsp", "Graph_Test")
+graph = deepcopy(graph_bays29_rsl)
+prim = Prim(graph)
+visited_nodes = Set{Node}()
+root_node = prim.nodes[1]  
+r = RSL!(prim, root_node, root_node, visited_nodes) 
+
+cost = cost_tour(graph_bays29_rsl, r)
+#############################################################################################
+#############################################################################################
+
+### On passe aux vraies images ###
+# 1)
+photo = build_graph("Phase 4/shredder-julia/tsp/instances/alaska-railroad.tsp", "Alaska Railroad")
+tour = RSL(photo)
+
+tour_parsed = parse.(Int, tour)
+write_tour("tour alaska-railroad RSL.tour", tour_parsed, Float32(cost_tour(photo, tour)))
+tour_filename = "Phase 4/shredder-julia/tsp/tours/alaska-railroad.tour"
+
+reconstruct_picture(tour_filename, "Phase 4/shredder-julia/images/shuffled/alaska-railroad.png", "photo_train_rsl.png", view=true)
+# bizarre, le tour donne les noeuds dans l'ordre ...
+
+# 2)
+photo2 = build_graph("Phase 4/shredder-julia/tsp/instances/pizza-food-wallpaper.tsp", "Pizza")
+tour2 = RSL(photo2)
+tour_parsed2 = parse.(Int, tour2)
+write_tour("tour pizza RSL.tour", tour_parsed2, Float32(cost_tour(photo2, tour2)))
+tour_filename = "Phase 4/shredder-julia/tsp/tours/alaska-railroad.tour"
+
+reconstruct_picture(tour_filename, "Phase 4/shredder-julia/images/shuffled/alaska-railroad.png", "photo_train_rsl.png", view=true)
 
 

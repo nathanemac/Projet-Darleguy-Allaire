@@ -207,3 +207,11 @@ function RSL!(graph::ExtendedGraph, racine::Node, root_node::Node, visited=Set{N
     return path
   end
 end
+
+function RSL(tsp::ExtendedGraph; kruskal_or_prim=Kruskal)
+  graph = deepcopy(tsp)
+  mst = kruskal_or_prim(graph)
+  root_node = mst.nodes[1]
+  visited_nodes = Set{Node}()
+  return RSL!(mst, root_node, root_node, visited_nodes)
+end
