@@ -12,13 +12,8 @@ function build_graph(instance::String, title::String)
     return "Current format is :", header["EDGE_WEIGHT_TYPE"]
   end
   # if header["EDGE_WEIGHT_FORMAT"] != "FULL_MATRIX"
-<<<<<<< Updated upstream
   #   @warn "edge weight format must be FULL_MATRIX"
   #   return "Current format is :", header["EDGE_WEIGHT_FORMAT"]
-=======
-    # @warn "edge weight format must be FULL_MATRIX"
-    # return "Current format is :", header["EDGE_WEIGHT_FORMAT"]
->>>>>>> Stashed changes
   # end
 
   nodes_graph = read_nodes(header, instance)

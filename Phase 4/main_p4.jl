@@ -6,8 +6,6 @@ include("../Phase 1/main.jl")
 include("../Phase 2/utils.jl")
 include("../Phase 2/PriorityQueue.jl")
 include("../Phase 3/utils.jl")
-<<<<<<< Updated upstream
-=======
 include("shredder-julia/bin/tools.jl")
 
 using ImageMagick, FileIO, Images, ImageView
@@ -100,5 +98,4 @@ tour_test = "Phase 4/shredder-julia/tsp/tours/alaska-railroad.tour"
 reconstruct_picture(tour_test, "Phase 4/shredder-julia/images/shuffled/alaska-railroad.png", "photo_train.png")
 # Ok fonctionne pour un fichier tour donné. 
 
->>>>>>> Stashed changes
 

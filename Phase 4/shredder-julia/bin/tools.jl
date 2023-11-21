@@ -33,11 +33,7 @@ function write_tour(filename::String, tour::Array{Int}, cost::Float32)
 	file = open(filename, "w")
 	length_tour = length(tour)
 	write(file,"NAME : $filename\n")
-<<<<<<< Updated upstream
-	write(file,"COMMENT : LENGHT = $cost\n")
-=======
 	write(file,"COMMENT : LENGTH = $cost\n")
->>>>>>> Stashed changes
 	write(file,"TYPE : TOUR\n")
 	write(file,"DIMENSION : $length_tour\n")
 	write(file,"TOUR_SECTION\n")
