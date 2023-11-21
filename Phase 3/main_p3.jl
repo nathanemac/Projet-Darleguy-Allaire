@@ -34,6 +34,8 @@ function create_graph()
 end
 kruskal, prim, cours = create_graph()
 
+
+# HK
 r = HK(cours) # converge en 15 itérations pour le noeud 1
 poids_tour_cours = sum(map(edge -> edge.weight, r.edges))
 
@@ -55,21 +57,16 @@ poids_tour_gr17 = sum(map(edge -> edge.weight, r4.edges))
 ### RSL 
 
 # sur exemple du cours
-visited_nodes = Set{Node}()
-root_node = kruskal.nodes[1]  
-path = RSL!(kruskal, root_node, root_node, visited_nodes) 
-
+tour = RSL(cours)
 # sur un tsp
-graph_bays29_rsl = deepcopy(build_graph("Phase 1/instances/stsp/bays29.tsp", "Graph_Test"))
-prim = Prim(graph_bays29_rsl)
-visited_nodes = Set{Node}()
-root_node = prim.nodes[1]  
-r5 = RSL!(prim, root_node, root_node, visited_nodes) 
+graph_bays29_rsl = build_graph("Phase 1/instances/stsp/bays29.tsp", "Graph_Test")
+r5 = RSL(graph_bays29_rsl) 
 
 # sur un autre tsp
-graph_gr17 = deepcopy(build_graph("Phase 1/instances/stsp/gr17.tsp", "Graph_Test"))
-prim = Prim(graph_gr17)
-visited_nodes = Set{Node}()
-root_node = prim.nodes[1]  
-r5 = RSL!(prim, root_node, root_node, visited_nodes) 
+graph_gr17 = build_graph("Phase 1/instances/stsp/gr17.tsp", "Graph_Test")
+r6 = RSL(graph_gr17) 
 # OK. 
+
+
+# Pour Victor: tu verras dans les paramètres de HK (tape ? puis HK dans le terminal), il y a pas mal de paramètres que l'utilisateur peut choisir. 
+# Ce serait bien de montrer comment ça marche, je peux te montrer si tu galères. 
