@@ -1,7 +1,7 @@
 #################################
 ########### Phase 1 #############
 #################################
-
+import Base.==
 abstract type AbstractEdge{T, U} end
 
 mutable struct Edge{T, U} <: AbstractEdge{T, U}
@@ -66,7 +66,7 @@ function read_edges(header::Dict{String, String}, filename::String)
                   for j = start : start + n_on_this_line - 1
                     # Les lignes suivantes ont été modifiées pour tenir compte du poids des arêtes
                     n_edges = n_edges + 1
-                    edge_weight_value = parse(Float64, data[start+j+1])
+                    edge_weight_value = parse(Float64, data[j+1])
                     if edge_weight_format in ["UPPER_ROW", "LOWER_COL"]
                       edge = (k+1, i+k+2, edge_weight_value)
                     elseif edge_weight_format in ["UPPER_DIAG_ROW", "LOWER_DIAG_COL"]
@@ -104,4 +104,10 @@ function read_edges(header::Dict{String, String}, filename::String)
   end
   close(file)
   return edges
+end
+
+"""Compare deux arêtes"""
+function ==(e1::Edge, e2::Edge)
+  return (e1.start_node==e2.start_node && e1.end_node==e2.end_node && e1.weight==e2.weight) ||
+        (e1.start_node == e2.end_node && e1.end_node == e2.start_node && e1.weight == e2.weight)
 end

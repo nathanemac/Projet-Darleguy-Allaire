@@ -284,7 +284,7 @@ function Prim(graph::ExtendedGraph; st_node::AbstractNode=graph.nodes[1])
     for edge in neighbours
       v = edge.start_node === u.data ? edge.end_node : edge.start_node
       if !(v in visited) && edge.weight < get_priority(q, v)
-        parent_map[v] = u.data # Utilisez parent_map au lieu de v.parent
+        parent_map[v] = u.data
         update_priority!(q, v, edge.weight)
       end
     end
