@@ -58,6 +58,7 @@ poids_tour_gr17 = sum(map(edge -> edge.weight, r4.edges))
 
 # sur exemple du cours
 tour = RSL(cours)
+
 # sur un tsp
 graph_bays29 = build_graph("Phase 1/instances/stsp/bays29.tsp", "Graph_Test")
 r5 = RSL(graph_bays29) 
