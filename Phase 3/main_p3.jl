@@ -7,9 +7,11 @@ include("../Phase 2/utils.jl")
 include("../Phase 2/PriorityQueue.jl")
 include("utils.jl")
 
+using Plots
+
 function create_graph()
   # 3 : exemple du cours
-  a, b, c, d, e, f, g, h, i = Node("a", 1.0), Node("b", 1.0), Node("c", 1.0), Node("d", 1.0), Node("e", 1.0), Node("f", 1.0), Node("g", 1.0), Node("h", 1.0), Node("i", 1.0)
+  a, b, c, d, e, f, g, h, i = Node("a", [0., 1.]), Node("b", [1., 2.]), Node("c", [2., 2.]), Node("d", [3., 2.]), Node("e", [4., 1.]), Node("f", [3., 0.]), Node("g", [2., 0.]), Node("h", [1., 0.]), Node("i", [1.5, 1.])
   e1 = Edge(a, b, 4.)
   e2 = Edge(b, c, 8.)
   e3 = Edge(c, d, 7.)
@@ -35,8 +37,6 @@ end
 kruskal, prim, cours = create_graph()
 
 
-# HK
-r = HK(cours) # converge en 15 itérations pour le noeud 1
 poids_tour_cours = sum(map(edge -> edge.weight, r.edges))
 
 
@@ -72,3 +72,24 @@ cost2 = cost_tour(graph_gr17, r6)
 
 # Pour Victor: tu verras dans les paramètres de HK (tape ? puis HK dans le terminal), il y a pas mal de paramètres que l'utilisateur peut choisir. 
 # Ce serait bien de montrer comment ça marche, je peux te montrer si tu galères. 
+
+# Les plots des tsp des villes : 
+g1 = build_graph("Phase 1/instances/stsp/bays29.tsp", "bays29")
+g2 = build_graph("Phase 1/instances/stsp/dantzig42.tsp", "dantzig42")
+g3 = build_graph("Phase 1/instances/stsp/gr120.tsp", "gr120")
+
+rg1 = RSL(g1) 
+rg2 = RSL(g2)
+rg3 = RSL(g3)
+
+tracer_graphe(rg1, g1, offset_x = 40, offset_y = 40, poids_opti=2020, placement_erreur=:topright)
+tracer_graphe(rg2, g2, offset_x = 3, offset_y=3, poids_opti=699, placement_erreur=:topright)
+tracer_graphe(rg3, g3, offset_x = 5, offset_y=5, poids_opti=6942, placement_erreur=:topright)
+
+# HK
+r = HK(cours) # converge en 15 itérations pour le noeud 1
+tour_cours = ["a", "b", "c", "d", "e", "f", "g", "i", "h"]
+tracer_graphe(tour_cours, cours, offset_x = 0.1, offset_y = 0.1)
+
+
+

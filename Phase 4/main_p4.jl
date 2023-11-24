@@ -123,17 +123,18 @@ cost = cost_tour(graph_bays29_rsl, r)
 ### On passe aux vraies images ###
 # 1)
 photo = build_graph("Phase 4/shredder-julia/tsp/instances/alaska-railroad.tsp", "Alaska Railroad")
-tour = RSL(photo)
+photo_sans_0 = remove_node_and_edges(photo, photo.nodes[1])
+tour = RSL(photo_sans_0)
 tour_parsed = parse.(Int, tour)
 tour_parsed .-= 1
 write_tour("alaska-railroad RSL.tour", tour_parsed, Float32(cost_tour(photo, tour)))
 tour_filename = "alaska-railroad RSL.tour"
 reconstruct_picture(tour_filename, "Phase 4/shredder-julia/images/shuffled/alaska-railroad.png", "photo_train_rsl.png", view=true)
-# bizarre, le tour donne les noeuds dans l'ordre ...
 
 # 2)
 photo2 = build_graph("Phase 4/shredder-julia/tsp/instances/pizza-food-wallpaper.tsp", "Pizza")
-tour2 = RSL(photo2)
+photo2_sans_0 = remove_node_and_edges(photo2, photo.nodes[1])
+tour2 = RSL(photo2_sans_0)
 tour_parsed2 = parse.(Int, tour2)
 tour_parsed2 .-= 1
 write_tour("pizza RSL.tour", tour_parsed2, Float32(cost_tour(photo2, tour2)))

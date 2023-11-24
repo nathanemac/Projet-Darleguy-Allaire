@@ -211,7 +211,59 @@ end
 function RSL(tsp::ExtendedGraph; kruskal_or_prim=Kruskal)
   graph = deepcopy(tsp)
   mst = kruskal_or_prim(graph)
-  root_node = mst.nodes[1]
+  root_node = mst.nodes[2]
   visited_nodes = Set{Node}()
   return RSL!(mst, root_node, root_node, visited_nodes)
+end
+
+
+function calculate_tour_weight(tour, graph::ExtendedGraph)
+  edge_weights = Dict()
+  for edge in graph.edges
+      edge_weights[(edge.start_node.name, edge.end_node.name)] = edge.weight
+      # Si votre graphe est non orienté et que le poids est le même dans les deux sens :
+      edge_weights[(edge.end_node.name, edge.start_node.name)] = edge.weight
+  end
+
+  total_weight = 0.0
+  for i in 1:length(tour)-1
+      start_node = tour[i]
+      end_node = tour[i+1]
+      # Vérifier si l'arête dans le sens inverse est également dans le dictionnaire
+      weight = get(edge_weights, (start_node, end_node), get(edge_weights, (end_node, start_node), NaN))
+      if isnan(weight)
+          error("Le poids de l'arête entre $start_node et $end_node est introuvable.")
+      end
+      total_weight += weight
+  end
+  return total_weight
+end
+
+
+function tracer_graphe(tour, graph::ExtendedGraph; offset_x=0, offset_y = 0, poids_opti = 1, placement_erreur = :topleft)
+  dict_nodes_data = Dict(node.name => node.data for node in graph.nodes)
+  xs = []
+  ys = []
+  
+  weight_tour = calculate_tour_weight(tour, graph)
+
+  for node in tour
+    push!(xs, dict_nodes_data[node][1])
+    push!(ys, dict_nodes_data[node][2])
+  end
+
+  plot(legend = false, title=graph.name, left_margin = 5Plots.mm, right_margin = 5Plots.mm, top_margin = 5Plots.mm, bottom_margin = 5Plots.mm)
+  for i in 1:length(xs)-1
+    plot!([xs[i], xs[i+1]], [ys[i], ys[i+1]], arrow=true)
+  end
+  
+  scatter!(xs, ys, label="Nodes", color="blue")
+
+  for (i, (x, y)) in enumerate(zip(xs, ys))
+    annotate!(x + offset_x, y + offset_y, text(tour[i], 8))  # Assurez-vous que parcours[i] contient le nom ou le numéro du nœud
+  end
+  rel = 100*round(weight_tour/poids_opti - 1, digits=2)
+  annotate!(placement_erreur, text("erreur relative : $(rel)%", 9))
+
+  display(plot!())
 end
