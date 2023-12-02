@@ -52,23 +52,15 @@ graph_gr17 = build_graph("Phase 1/instances/stsp/gr17.tsp", "Graph_Test")
 r4 = HK(graph_gr17, verbose=1000, maxIter=20000) # ne converge pas
 poids_tour_gr17 = sum(map(edge -> edge.weight, r4.edges))
 
+graph_bayg29 = build_graph("Phase 1/instances/stsp/bayg29.tsp", "Graph_Test")
+r5 = RSL(graph_bayg29) 
+
 
 
 ### RSL 
 
 # sur exemple du cours
 tour = RSL(cours)
-
-# sur un tsp
-graph_bays29 = build_graph("Phase 1/instances/stsp/bays29.tsp", "Graph_Test")
-r5 = RSL(graph_bays29) 
-cost1 = cost_tour(graph_bays29, r5)
-
-
-# sur un autre tsp
-graph_gr17 = build_graph("Phase 1/instances/stsp/gr17.tsp", "Graph_Test")
-r6 = RSL(graph_gr17) 
-cost2 = cost_tour(graph_gr17, r6)
 
 # Pour Victor: tu verras dans les paramètres de HK (tape ? puis HK dans le terminal), il y a pas mal de paramètres que l'utilisateur peut choisir. 
 # Ce serait bien de montrer comment ça marche, je peux te montrer si tu galères. 
